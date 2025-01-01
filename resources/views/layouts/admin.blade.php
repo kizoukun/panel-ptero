@@ -122,6 +122,11 @@
                                 <i class="fa fa-th-large"></i> <span>Nests</span>
                             </a>
                         </li>
+                        <li class="{{ ! starts_with(Route::currentRouteName(), 'admin.game-plugins') ?: 'active' }}">
+                            <a href="{{ route('admin.game-plugins') }}">
+                                <i class="fa fa-th-large"></i> <span>Game Plugins</span>
+                            </a>
+                        </li>
                     </ul>
                 </section>
             </aside>

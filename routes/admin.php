@@ -226,3 +226,21 @@ Route::group(['prefix' => 'nests'], function () {
     Route::delete('/egg/{egg:id}', [Admin\Nests\EggController::class, 'destroy']);
     Route::delete('/egg/{egg:id}/variables/{variable:id}', [Admin\Nests\EggVariableController::class, 'destroy']);
 });
+
+/*
+|--------------------------------------------------------------------------
+| Game Plugins Controller Routes
+|--------------------------------------------------------------------------
+|
+| Endpoint: /admin/game-plugins
+|
+*/
+
+Route::group(['prefix' => 'game-plugins'], function () {
+    Route::get('/', [Admin\GamePluginsController::class, 'index'])->name('admin.game-plugins');
+    Route::get('/new', [Admin\GamePluginsController::class, 'create'])->name('admin.game-plugins.new');
+    Route::get('/view/{game_plugin:id}', [Admin\GamePluginsController::class, 'view'])->name('admin.game-plugins.view');
+
+    Route::post('/new', [Admin\GamePluginsController::class, 'store']);
+    Route::patch('/view/{game_plugin:id}', [Admin\GamePluginsController::class, 'update']);
+});

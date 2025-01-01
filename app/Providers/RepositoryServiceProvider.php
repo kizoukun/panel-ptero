@@ -3,7 +3,9 @@
 namespace Pterodactyl\Providers;
 
 use Illuminate\Support\ServiceProvider;
+use Pterodactyl\Contracts\Repository\GamePluginRepositoryInterface;
 use Pterodactyl\Repositories\Eloquent\EggRepository;
+use Pterodactyl\Repositories\Eloquent\GamePluginRepository;
 use Pterodactyl\Repositories\Eloquent\NestRepository;
 use Pterodactyl\Repositories\Eloquent\NodeRepository;
 use Pterodactyl\Repositories\Eloquent\TaskRepository;
@@ -63,5 +65,6 @@ class RepositoryServiceProvider extends ServiceProvider
         $this->app->bind(SubuserRepositoryInterface::class, SubuserRepository::class);
         $this->app->bind(TaskRepositoryInterface::class, TaskRepository::class);
         $this->app->bind(UserRepositoryInterface::class, UserRepository::class);
+        $this->app->bind(GamePluginRepositoryInterface::class, GamePluginRepository::class);
     }
 }
