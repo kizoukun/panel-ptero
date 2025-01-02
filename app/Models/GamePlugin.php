@@ -2,6 +2,8 @@
 
 namespace Pterodactyl\Models;
 
+use Illuminate\Database\Eloquent\Collection;
+
 /**
  * @property int $id
  * @property string $name
@@ -14,6 +16,7 @@ namespace Pterodactyl\Models;
  * @property string $install_folder
  * @property bool $is_delete_all
  * @property array $delete_folder
+ * @property bool $is_installed
  */
 class GamePlugin extends Model
 {
@@ -54,5 +57,10 @@ class GamePlugin extends Model
         'is_delete_all' => false,
         'delete_folder' => '[]',
     ];
+
+    public function getGameCategories(): Collection
+    {
+        return $this->newQuery()->selectRaw('LOWER(category) as category')->distinct()->get();
+    }
 
 }

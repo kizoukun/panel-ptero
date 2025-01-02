@@ -139,4 +139,11 @@ Route::group([
         Route::post('/reinstall', [Client\Servers\SettingsController::class, 'reinstall']);
         Route::put('/docker-image', [Client\Servers\SettingsController::class, 'dockerImage']);
     });
+
+    Route::group(['prefix' => '/game-plugins'], function () {
+        Route::get('/', [Client\Servers\GamePluginController::class, 'index']);
+        Route::get('/categories', [Client\Servers\GamePluginController::class, 'category']);
+        Route::post('/install', [Client\Servers\GamePluginController::class, 'install']);
+        Route::post('/uninstall', [Client\Servers\GamePluginController::class, 'uninstall']);
+    });
 });
