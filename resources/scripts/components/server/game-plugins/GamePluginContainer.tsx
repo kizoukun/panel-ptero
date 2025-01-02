@@ -31,7 +31,7 @@ export default () => {
                         />
                     </GreyRowBox>
 
-                <GamePluginRow category={selectedCategory} filter={pluginName} />
+                    <GamePluginRow category={selectedCategory} filter={pluginName} />
                 </div>
             </ErrorBoundary>
         </ServerContentBlock>

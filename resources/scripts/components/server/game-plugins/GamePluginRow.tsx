@@ -1,10 +1,9 @@
 import GreyRowBox from '@/components/elements/GreyRowBox';
 import InstallPluginButton from '@/components/server/game-plugins/InstallPluginButton';
 import UninstallPluginButton from '@/components/server/game-plugins/UninstallPluginButton';
-import React, { useEffect, useState } from 'react';
-import getPlugins, { GamePlugin } from '@/api/server/game-plugins/getPlugins';
+import React, { useEffect } from 'react';
+import getPlugins from '@/api/server/game-plugins/getPlugins';
 import { ServerContext } from '@/state/server';
-import installPlugin from '@/api/server/game-plugins/installPlugin';
 import Spinner from '@/components/elements/Spinner';
 
 interface GamePluginRowProps {
