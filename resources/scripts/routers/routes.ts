@@ -141,11 +141,5 @@ export default {
             name: 'Activity',
             component: ServerActivityLogContainer,
         },
-        {
-            path: '/game-plugins',
-            permission: 'file.*',
-            name: 'Game Plugins',
-            component: GamePluginContainer,
-        },
     ],
 } as Routes;

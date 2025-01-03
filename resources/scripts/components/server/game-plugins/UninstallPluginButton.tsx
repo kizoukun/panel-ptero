@@ -5,27 +5,31 @@ import { ServerContext } from '@/state/server';
 import { useFlashKey } from '@/plugins/useFlash';
 import { Dialog } from '@/components/elements/dialog';
 import { Button } from '@/components/elements/button/index';
-import getPlugins, { GamePlugin } from '@/api/server/game-plugins/getPlugins';
+import { GamePlugin } from '@/api/server/game-plugins/getPlugins';
 import uninstallPlugin from '@/api/server/game-plugins/uninstallPlugin';
+import { httpErrorToHuman } from '@/api/http';
 
 type UninstallPluginButtonProps = {
     plugin: GamePlugin;
+    revalidate: () => void;
 };
-const UninstallPluginTsx = ({ plugin }: UninstallPluginButtonProps) => {
+const UninstallPluginTsx = ({ plugin, revalidate }: UninstallPluginButtonProps) => {
     const [confirm, setConfirm] = useState(false);
 
     const uuid = ServerContext.useStoreState((state) => state.server.data!.uuid);
 
-    const { clearFlashes } = useFlashKey('server:game-plugins');
-
-    const { revalidate } = getPlugins(uuid);
+    const { addError, clearFlashes } = useFlashKey('server:game-plugins');
 
     async function onUninstallInstallPlugin() {
         clearFlashes();
-        uninstallPlugin(uuid, plugin.id).then(() => {
-            setConfirm(false);
-            revalidate();
-        });
+        await uninstallPlugin(uuid, plugin.id)
+            .then(() => {
+                revalidate();
+            })
+            .catch((err) => {
+                addError(httpErrorToHuman(err));
+            });
+        setConfirm(false);
     }
 
     return (

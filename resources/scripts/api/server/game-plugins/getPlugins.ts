@@ -42,14 +42,10 @@ export default (uuid: string, category?: string | null, filter?: string) => {
         { revalidateOnFocus: false, revalidateOnMount: false }
     );
 
-    async function revalidateData() {
-        return await mutate(data);
-    }
-
     return {
         data,
         isLoading: isValidating,
         isError: error,
-        revalidate: revalidateData,
+        revalidate: () => mutate(),
     };
 };

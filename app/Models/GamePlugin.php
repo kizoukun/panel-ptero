@@ -15,6 +15,7 @@ use Illuminate\Database\Eloquent\Collection;
  * @property string|null $decompress_type
  * @property string $install_folder
  * @property bool $is_delete_all
+ * @property bool $delete_from_base
  * @property array $delete_folder
  * @property bool $is_installed
  */
@@ -45,10 +46,11 @@ class GamePlugin extends Model
         'category' => 'required|string|max:191',
         'description' => 'string|nullable',
         'eggs' => 'array|nullable',
-        'download_url' => 'string',
+        'download_url' => 'required|url',
         'decompress_type' => 'string|nullable',
         'install_folder' => 'string',
         'is_delete_all' => 'boolean',
+        'delete_from_base' => 'boolean',
         'delete_folder' => 'array',
     ];
 

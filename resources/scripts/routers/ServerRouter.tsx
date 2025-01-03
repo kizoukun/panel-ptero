@@ -20,6 +20,7 @@ import { useLocation } from 'react-router';
 import ConflictStateRenderer from '@/components/server/ConflictStateRenderer';
 import PermissionRoute from '@/components/elements/PermissionRoute';
 import routes from '@/routers/routes';
+import GamePluginContainer from '@/components/server/game-plugins/GamePluginContainer';
 
 export default () => {
     const match = useRouteMatch<{ id: string }>();
@@ -30,10 +31,13 @@ export default () => {
 
     const id = ServerContext.useStoreState((state) => state.server.data?.id);
     const uuid = ServerContext.useStoreState((state) => state.server.data?.uuid);
+    const eggId = ServerContext.useStoreState((state) => state.server.data?.eggId);
     const inConflictState = ServerContext.useStoreState((state) => state.server.inConflictState);
     const serverId = ServerContext.useStoreState((state) => state.server.data?.internalId);
+    const categories = ServerContext.useStoreState((state) => state.gamePlugins.categories);
     const getServer = ServerContext.useStoreActions((actions) => actions.server.getServer);
     const clearServerState = ServerContext.useStoreActions((actions) => actions.clearServerState);
+    const getCategories = ServerContext.useStoreActions((actions) => actions.gamePlugins.getCategories);
 
     const to = (value: string, url = false) => {
         if (value === '/') {
@@ -61,6 +65,17 @@ export default () => {
             clearServerState();
         };
     }, [match.params.id]);
+
+    useEffect(() => {
+        if (!eggId || !uuid) {
+            return;
+        }
+
+        getCategories({ uuid, eggId }).catch((error: Error) => {
+            console.error(error);
+            setError(httpErrorToHuman(error));
+        });
+    }, [eggId, uuid]);
 
     return (
         <React.Fragment key={'server-router'}>
@@ -91,6 +106,11 @@ export default () => {
                                             </NavLink>
                                         )
                                     )}
+                                {categories.length > 0 && (
+                                    <Can action={'file.*'} matchAny>
+                                        <NavLink to={to('/game-plugins', true)}>Game Plugins</NavLink>
+                                    </Can>
+                                )}
                                 {rootAdmin && (
                                     // eslint-disable-next-line react/jsx-no-target-blank
                                     <a href={`/admin/servers/view/${serverId}`} target={'_blank'}>
@@ -116,6 +136,18 @@ export default () => {
                                             </Spinner.Suspense>
                                         </PermissionRoute>
                                     ))}
+                                    {categories.length > 0 && (
+                                        <PermissionRoute
+                                            key={'/game-plugins'}
+                                            permission={'file.*'}
+                                            path={to('/game-plugins')}
+                                            exact
+                                        >
+                                            <Spinner.Suspense>
+                                                <GamePluginContainer />
+                                            </Spinner.Suspense>
+                                        </PermissionRoute>
+                                    )}
                                     <Route path={'*'} component={NotFound} />
                                 </Switch>
                             </TransitionRouter>

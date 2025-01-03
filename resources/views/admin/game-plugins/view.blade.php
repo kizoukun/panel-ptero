@@ -86,7 +86,7 @@
                         <div class="col-md-4">
                             <div class="form-group">
                                 <label for="decompress" class="control-label">Decompress Type</label>
-                                <select name="decompress" class="form-control">
+                                <select name="decompress_type" class="form-control">
                                     <option value="" @if(old('decompress') == '' || is_null($plugin->decompress_type)) selected @endif>None</option>
                                     <option value="unzip" @if(old('decompress') == 'unzip' || $plugin->decompress_type == 'unzip') selected @endif>Unzip
                                     </option>
@@ -104,8 +104,8 @@
                             <div class="form-group">
                                 <label for="folder" class="control-label">Install Folder</label>
                                 <div class="input-group">
-                                    <span class="input-group-addon" id="folder">/home/container/</span>
-                                    <input type="text" id="folder" name="install_folder" class="form-control"
+                                    <span class="input-group-addon">/home/container/</span>
+                                    <input type="text" id="install_folder" name="install_folder" class="form-control"
                                            placeholder="Example: mods" aria-describedby="folder"
                                            value="{{ old('install_folder') ?? $plugin->install_folder }}">
                                 </div>
@@ -121,6 +121,14 @@
                             </div>
                         </div>
                         <div id="delete-file" class="{{ $plugin->is_delete_all ? 'hidden' : '' }}">
+                            <div class="col-md-12">
+                                <div class="form-group">
+                                    <div class="checkbox checkbox-primary no-margin-bottom">
+                                        <input type="checkbox" id="delete-from-base" name="delete_from_base" @checked($plugin->delete_from_base) />
+                                        <label for="delete-from-base" class="strong">It will delete from Install Folder Configuration</label>
+                                    </div>
+                                </div>
+                            </div>
                             <div class="col-md-12" style="display: flex; justify-content: end;">
                                 <button type="button" id="new_line" class="btn btn-success">Add New Line</button>
                             </div>
@@ -144,12 +152,16 @@
     <script>
 
         function addNewLine(defaultValue) {
+            let folderName = '/home/container/'
+            if($('#delete-from-base').prop('checked')) {
+                folderName = `%/${$('#install_folder').val()}/`
+            }
             return `
         <div class="col-md-12">
             <div class="form-group">
                 <label class="control-label">Delete Folder or File</label>
                 <div class="input-group">
-                    <span class="input-group-addon" id="folder">/home/container/</span>
+                    <span class="input-group-addon" id="folder">${folderName}</span>
                     <input type="text" name="delete_folder[]" class="form-control" ${defaultValue ? `value="${defaultValue}"` : ''} placeholder="Example: mods" aria-describedby="folder">
                     <span class="input-group-btn">
                         <button class="btn btn-danger delete-btn" type="button"><i class="fa fa-trash-o"></i></button>
@@ -180,6 +192,28 @@
                     $('#delete-file').addClass('hidden');
                 } else {
                     $('#delete-file').removeClass('hidden');
+                }
+            });
+
+            $('#install_folder').on('input', (event) => {
+                if($('#delete-from-base').prop('checked')) {
+                    $(document).trigger('update-folder', event.target.value);
+                }
+            });
+
+            $('#delete-from-base').change((event) => {
+                if ($(event.target).prop('checked')) {
+                    $(document).trigger('update-folder', $('#install_folder').val());
+                } else {
+                    $(document).trigger('update-folder', '');
+                }
+            });
+
+            $(document).on('update-folder', (event, inputValue) => {
+                if (inputValue.length > 0) {
+                    $('span#folder').text(`%/${inputValue}/`);
+                } else {
+                    $('span#folder').text(`/home/container/`);
                 }
             });
 

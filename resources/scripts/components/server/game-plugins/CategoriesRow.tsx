@@ -1,6 +1,6 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import GreyRowBox from '@/components/elements/GreyRowBox';
-import getCategories from '@/api/server/game-plugins/getCategories';
+import { ServerContext } from '@/state/server';
 
 interface CategoriesRowProps {
     selectedCategory: string | null;
@@ -8,11 +8,7 @@ interface CategoriesRowProps {
 }
 
 export default ({ selectedCategory, setSelectedCategory }: CategoriesRowProps) => {
-    const { data: categoriesData, mutate } = getCategories();
-
-    useEffect(() => {
-        mutate(categoriesData).then((r) => r);
-    }, []);
+    const categoriesData = ServerContext.useStoreState((state) => state.gamePlugins.categories);
 
     function onClickCategory(item: string) {
         if (item === selectedCategory) {
@@ -27,14 +23,14 @@ export default ({ selectedCategory, setSelectedCategory }: CategoriesRowProps) =
         <GreyRowBox $hoverable={false}>
             <div className={'flex gap-4 overflow-x-auto'}>
                 {categoriesData?.map((item, index) => (
-                    <React.Fragment key={`item-${item}-${index}`}>
-                        <div onClick={() => onClickCategory(item)}>
+                    <React.Fragment key={`item-${item.category}-${index}`}>
+                        <div onClick={() => onClickCategory(item.category)}>
                             <p
                                 className={`${
-                                    selectedCategory === item ? 'text-primary' : 'text-gray-300'
+                                    selectedCategory === item.category ? 'text-primary' : 'text-gray-300'
                                 }  hover:cursor-pointer capitalize`}
                             >
-                                {item}
+                                {item.category}
                             </p>
                         </div>
                         {index < categoriesData.length - 1 && <span className={'text-gray-400'}>&nbsp;|&nbsp;</span>}

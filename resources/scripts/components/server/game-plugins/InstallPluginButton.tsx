@@ -5,28 +5,32 @@ import { ServerContext } from '@/state/server';
 import { useFlashKey } from '@/plugins/useFlash';
 import { Dialog } from '@/components/elements/dialog';
 import { Button } from '@/components/elements/button/index';
-import getPlugins, { GamePlugin } from '@/api/server/game-plugins/getPlugins';
+import { GamePlugin } from '@/api/server/game-plugins/getPlugins';
 import installPlugin from '@/api/server/game-plugins/installPlugin';
+import { httpErrorToHuman } from '@/api/http';
 
 type InstallPluginButtonProps = {
     plugin: GamePlugin;
+    revalidate: () => void;
 };
 
-const InstallPluginButton = ({ plugin }: InstallPluginButtonProps) => {
+const InstallPluginButton = ({ plugin, revalidate }: InstallPluginButtonProps) => {
     const [confirm, setConfirm] = useState(false);
 
     const uuid = ServerContext.useStoreState((state) => state.server.data!.uuid);
 
-    const { clearFlashes } = useFlashKey('server:game-plugins');
-
-    const { revalidate } = getPlugins(uuid);
+    const { addError, clearFlashes } = useFlashKey('game-plugins');
 
     async function onInstallPlugin() {
         clearFlashes();
-        installPlugin(uuid, plugin.id).then(() => {
-            setConfirm(false);
-            revalidate();
-        });
+        await installPlugin(uuid, plugin.id)
+            .then(() => {
+                revalidate();
+            })
+            .catch((err) => {
+                addError(httpErrorToHuman(err));
+            });
+        setConfirm(false);
     }
 
     return (

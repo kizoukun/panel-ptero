@@ -22,6 +22,7 @@ return new class extends Migration
             $table->string('decompress_type')->nullable();
             $table->string('install_folder');
             $table->boolean('is_delete_all')->default(false);
+            $table->boolean('delete_from_base')->default(false);
             $table->json('delete_folder')->nullable();
             $table->timestamps();
         });

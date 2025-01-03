@@ -243,4 +243,6 @@ Route::group(['prefix' => 'game-plugins'], function () {
 
     Route::post('/new', [Admin\GamePluginsController::class, 'store']);
     Route::patch('/view/{game_plugin:id}', [Admin\GamePluginsController::class, 'update']);
+
+    Route::delete('/delete/{game_plugin:id}', [Admin\GamePluginsController::class, 'delete'])->name('admin.game-plugins.delete');
 });

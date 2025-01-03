@@ -2,9 +2,10 @@
 
 namespace Pterodactyl\Repositories\Eloquent;
 
+use Pterodactyl\Models\Server;
+use Pterodactyl\Models\GamePlugin;
 use Illuminate\Database\Eloquent\Collection;
 use Pterodactyl\Contracts\Repository\GamePluginRepositoryInterface;
-use Pterodactyl\Models\GamePlugin;
 
 class GamePluginRepository extends EloquentRepository implements GamePluginRepositoryInterface
 {
@@ -16,8 +17,31 @@ class GamePluginRepository extends EloquentRepository implements GamePluginRepos
         return GamePlugin::class;
     }
 
-    public function getGameCategories(): Collection
+    public function getGameCategories(Server $server): Collection
     {
-        return $this->getBuilder()->selectRaw('LOWER(category) as category')->distinct()->get();
+        $data = $this->getBuilder()
+            ->selectRaw('LOWER(category) as category, eggs')
+            ->get()
+            ->groupBy('category')
+            ->map(function ($group) {
+                return [
+                    'category' => $group->first()->category,
+                    'eggs' => $group->pluck('eggs')->flatMap(function ($eggs) {
+                        if (is_string($eggs)) {
+                            $decoded = json_decode($eggs, true);
+
+                            return $decoded !== null ? $decoded : [];
+                        }
+
+                        return is_array($eggs) ? $eggs : [];
+                    })->unique()->values(),
+                ];
+            });
+
+        $filtered = $data->filter(function ($category) use ($server) {
+            return in_array($server->egg_id, $category['eggs']->toArray());
+        });
+
+        return new Collection($filtered->values());
     }
 }

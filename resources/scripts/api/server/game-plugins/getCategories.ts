@@ -1,17 +1,31 @@
 import http from '@/api/http';
-import { ServerContext } from '@/state/server';
-import useSWR from 'swr';
 
-export default () => {
-    const uuid = ServerContext.useStoreState((state) => state.server.data!.uuid);
+export interface GamePluginCategory {
+    category: string;
+    eggs: string[];
+}
 
-    return useSWR<string[]>(
-        ['server:game-plugins:categories', uuid],
-        async () => {
-            const { data } = await http.get(`/api/client/servers/${uuid}/game-plugins/categories`);
+interface ResponseData {
+    [key: string]: any;
+}
 
-            return data || [];
-        },
-        { revalidateOnFocus: false, revalidateOnMount: false }
-    );
+function rawDataToGamePluginCategoryObject(data: ResponseData): GamePluginCategory {
+    return {
+        category: data.category,
+        eggs: data.eggs,
+    };
+}
+
+export default (uuid: string, eggId: string | number): Promise<GamePluginCategory[]> => {
+    return new Promise((resolve, reject) => {
+        http.get(`/api/client/servers/${uuid}/game-plugins/categories`)
+            .then(({ data }) => {
+                const listData = data || [];
+                const dataMapped: GamePluginCategory[] = listData.map((datum: any) =>
+                    rawDataToGamePluginCategoryObject(datum)
+                );
+                resolve(dataMapped.filter((datum) => datum.eggs.includes(eggId.toString())));
+            })
+            .catch(reject);
+    });
 };

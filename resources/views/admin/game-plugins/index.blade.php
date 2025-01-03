@@ -47,11 +47,16 @@
                                 <td style="text-transform: capitalize;">{{ $plugin->category }}</td>
                                 <td class="text-center"><code>{{ $plugin->version }}</code></td>
                                 <td class="text-center">
-                                    <div>
+                                    <div style="display: flex; justify-content: center; gap: 0.25rem">
                                         <a href="{{ route('admin.game-plugins.view', $plugin->id) }}">
                                             <button class="btn btn-primary btn-sm"><i class="fa fa-pencil"></i></button>
                                         </a>
-                                        <button class="btn btn-danger btn-sm"><i class="fa fa-trash-o"></i></button>
+                                        <form id="deleteform" action="{{ route('admin.game-plugins.delete', $plugin->id) }}" method="POST">
+                                            {!! csrf_field() !!}
+                                            @method('DELETE')
+                                            <input type="hidden" name="id" value="{{ $plugin->id }}">
+                                            <button type="button" class="deletebtn btn btn-danger btn-sm"><i class="fa fa-trash-o"></i></button>
+                                        </form>
                                     </div>
                                 </td>
                             </tr>
@@ -67,4 +72,29 @@
             </div>
         </div>
     </div>
+
+@endsection
+
+@section('footer-scripts')
+    @parent
+
+    <script>
+        $(document).ready(() => {
+            $(document).on('click', '.deletebtn', function (event) {
+                event.preventDefault();
+                const form = $(this).closest('form'); // Get the closest form for the clicked button
+                swal({
+                    title: '',
+                    type: 'warning',
+                    text: 'Are you sure that you want to delete this server? There is no going back, all data will immediately be removed.',
+                    showCancelButton: true,
+                    confirmButtonText: 'Delete',
+                    confirmButtonColor: '#d9534f',
+                    closeOnConfirm: false
+                }, function () {
+                    form.submit(); // Submit the specific form
+                });
+            });
+        });
+    </script>
 @endsection

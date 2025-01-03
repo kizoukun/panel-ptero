@@ -2,6 +2,7 @@
 
 namespace Pterodactyl\Http\Controllers\Admin;
 
+use Illuminate\Support\Facades\Log;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\NotFoundExceptionInterface;
 use Pterodactyl\Exceptions\Repository\RecordNotFoundException;
@@ -86,6 +87,18 @@ class GamePluginsController extends Controller
         $this->updateService->handle($game_plugin, $request->normalize());
 
         $this->alert->success('Successfully updated game plugins.')->flash();
+
+        return redirect(route('admin.game-plugins'));
+    }
+
+    /**
+     * @throws RecordNotFoundException
+     */
+    public function delete(GamePlugin $game_plugin): RedirectResponse
+    {
+        $game_plugin->delete();
+
+        $this->alert->success('Successfully deleted game plugins.')->flash();
 
         return redirect(route('admin.game-plugins'));
     }

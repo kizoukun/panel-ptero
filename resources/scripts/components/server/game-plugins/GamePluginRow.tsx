@@ -5,6 +5,8 @@ import React, { useEffect } from 'react';
 import getPlugins from '@/api/server/game-plugins/getPlugins';
 import { ServerContext } from '@/state/server';
 import Spinner from '@/components/elements/Spinner';
+import useFlash from '@/plugins/useFlash';
+import { httpErrorToHuman } from '@/api/http';
 
 interface GamePluginRowProps {
     category?: string | null;
@@ -14,10 +16,23 @@ interface GamePluginRowProps {
 export default ({ category, filter }: GamePluginRowProps) => {
     const uuid = ServerContext.useStoreState((state) => state.server.data!.uuid);
 
-    const { data: plugins, isLoading, revalidate } = getPlugins(uuid, category, filter);
+    const { data: plugins, isLoading, revalidate, isError } = getPlugins(uuid, category, filter);
+
+    const { addError, clearFlashes } = useFlash();
+
+    function revalidateData() {
+        revalidate().then((r) => r);
+    }
 
     useEffect(() => {
-        revalidate().then((r) => r);
+        clearFlashes('game-plugins');
+        if (isError) {
+            addError({ key: 'game-plugins', message: httpErrorToHuman(isError) });
+        }
+    }, [isError]);
+
+    useEffect(() => {
+        revalidateData();
     }, [uuid, category, filter]);
 
     return (
@@ -37,9 +52,9 @@ export default ({ category, filter }: GamePluginRowProps) => {
                             </div>
                             <div>
                                 {plugin.isInstalled ? (
-                                    <UninstallPluginButton plugin={plugin} />
+                                    <UninstallPluginButton plugin={plugin} revalidate={revalidateData} />
                                 ) : (
-                                    <InstallPluginButton plugin={plugin} />
+                                    <InstallPluginButton plugin={plugin} revalidate={revalidateData} />
                                 )}
                             </div>
                         </div>

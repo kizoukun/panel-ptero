@@ -7,6 +7,7 @@ import { composeWithDevTools } from 'redux-devtools-extension';
 import schedules, { ServerScheduleStore } from '@/state/server/schedules';
 import databases, { ServerDatabaseStore } from '@/state/server/databases';
 import isEqual from 'react-fast-compare';
+import gamePlugins, { GamePluginStore } from '@/state/server/game-plugins';
 
 export type ServerStatus = 'offline' | 'starting' | 'stopping' | 'running' | null;
 
@@ -84,6 +85,7 @@ export interface ServerStore {
     schedules: ServerScheduleStore;
     socket: SocketStore;
     status: ServerStatusStore;
+    gamePlugins: GamePluginStore;
     clearServerState: Action<ServerStore>;
 }
 
@@ -96,6 +98,7 @@ export const ServerContext = createContextStore<ServerStore>(
         files,
         subusers,
         schedules,
+        gamePlugins,
         clearServerState: action((state) => {
             state.server.data = undefined;
             state.server.permissions = [];
@@ -104,6 +107,7 @@ export const ServerContext = createContextStore<ServerStore>(
             state.files.directory = '/';
             state.files.selectedFiles = [];
             state.schedules.data = [];
+            state.gamePlugins.categories = [];
 
             if (state.socket.instance) {
                 state.socket.instance.removeAllListeners();

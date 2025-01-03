@@ -12,8 +12,15 @@ class GamePluginFormRequest extends AdminFormRequest
         if (strtolower($this->input('is_delete_all')) === 'on') {
             $is_delete_all = true;
         }
+
+        $delete_from_base = false;
+        if (strtolower($this->input('delete_from_base')) === 'on') {
+            $delete_from_base = true;
+        }
+
         $this->merge([
             'is_delete_all' => $is_delete_all,
+            'delete_from_base' => $delete_from_base,
         ]);
     }
 

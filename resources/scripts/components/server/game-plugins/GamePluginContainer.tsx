@@ -16,7 +16,7 @@ export default () => {
     }, 750);
 
     return (
-        <ServerContentBlock title={'File Manager'} showFlashKey={'files'}>
+        <ServerContentBlock title={'Game Plugins'} showFlashKey={'game-plugins'}>
             <ErrorBoundary>
                 <div className={'space-y-4'}>
                     <CategoriesRow selectedCategory={selectedCategory} setSelectedCategory={setSelectedCategory} />
